@@ -1,0 +1,69 @@
+TI LM3632 MFD Driver
+
+Required properties:
+  - compatible: "ti,lm3632"
+  - reg: I2C slave address. 0x11.
+  - ti,en-gpio: GPIO number of LM3632 EN pin.
+
+LM3632 consists of lm3632-regulator and lm3632-bl.
+
+For the LM3632 regulator properties please refer to:
+Documentation/devicetree/bindings/regulator/lm3632-regulator.txt
+
+For the LM3632 backlight properties please refer to:
+Documentation/devicetree/bindings/video/backlight/lm3632_bl.txt
+
+Example:
+
+lm3632@11 {
+	compatible = "ti,lm3632";
+	reg = <0x11>;
+
+	/* GPIO for EN pin */
+	ti,en-gpio = <&gpio0 3 0>;
+
+	/* Vpos and Vneg are used with LCD boost */
+	regulators {
+		compatible = "ti,lm3632-regulator";
+
+		/* GPIOs for LCM_EN1 and LCM_EN2 pins */
+		ti,lcm-en1-gpio = <&gpio0 2 0>;
+		ti,lcm-en2-gpio = <&gpio0 4 0>;
+
+		vboost {
+			regulator-name = "lcd_boost";
+			regulator-min-microvolt = <4500000>;
+			regulator-max-microvolt = <6400000>;
+			regulator-always-on;
+		};
+
+		vpos {
+			regulator-name = "lcd_vpos";
+			regulator-min-microvolt = <4000000>;
+			regulator-max-microvolt = <6000000>;
+			regulator-boot-on;
+		};
+
+		vneg {
+			regulator-name = "lcd_vneg";
+			regulator-min-microvolt = <4000000>;
+			regulator-max-microvolt = <6000000>;
+			regulator-boot-on;
+		};
+	};
+
+	/* Backlight mode is PWM, two strings used */
+	backlight {
+		compatible = "ti,lm3632-backlight";
+
+		bl-name = "lcd";
+		full-strings-used;
+
+		pwm-period = <10000>;
+		pwm-max-brightness = <1637>; /* 20mA */
+
+		/* PWM controller for lm3632 backlight */
+		pwms = <&pwm3943 0 10000>;
+		pwm-names = "lm3632-backlight";
+	};
+};

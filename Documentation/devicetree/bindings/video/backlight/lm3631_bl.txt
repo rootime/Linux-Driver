@@ -1,0 +1,65 @@
+TI LM3631 Backlight Driver
+
+Required properties:
+  - compatible: "ti,lm3631-backlight"
+
+Optional properties:
+  - bl-name: Backlight device name
+  - full-strings-used: Define it in case of two LED strings used.
+  - mode-pwm-only: PWM input mode
+    or mode-comb1: I2C x PWM befoer sloping
+    or mode-comb2: Sloped I2C x PWM
+    The default mode is the I2C only.
+  - initial-brightness: Initial brightness value
+
+PWM specific optional properties:
+  - pwm-period: PWM period value. Define it in case of PWM based control mode.
+  - pwms and pwm-names: Please refer to Documentation/devicetree/bindings/pwm/pwm.txt.
+
+
+Example 1:
+Brightness is I2C only mode. Backlight device name is 'lcd'.
+
+&i2c4 {
+	clock-frequency = <400000>;
+
+	lm3631@29 {
+		compatible = "ti,lm3631";
+		reg = <0x29>;
+
+		/* GPIO134 for HWEN pin */
+		ti,en-gpio = <&gpio5 6 0>;
+
+		backlight {
+			compatible = "ti,lm3631-backlight";
+			bl-name = "lcd";
+			full-strings-used;
+		};
+};
+
+Example 2:
+LM3631 brightness is controlled by PWM3943 controller.
+PWM3943 is a PWM controller. PWM#1 is port number of PMW3943.
+
+&i2c4 {
+	clock-frequency = <400000>;
+
+	lm3631@29 {
+		compatible = "ti,lm3631";
+		reg = <0x29>;
+
+		/* GPIO134 for HWEN pin */
+		ti,en-gpio = <&gpio5 6 0>;
+
+		backlight {
+			compatible = "ti,lm3631-backlight";
+			bl-name = "lcd";
+			full-strings-used;
+			mode-pwm-only;
+
+			pwm-period = <10000>;
+
+			pwms = <&pwm3943 1 10000>;
+			pwm-names = "lm3631-backlight";
+		};
+};

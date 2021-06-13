@@ -1,0 +1,58 @@
+TI LM3632 Backlight Driver
+
+Required properties:
+  - compatible: "ti,lm3632-backlight"
+
+Optional properties:
+  - bl-name: Backlight device name. /sys/class/backlight/##bl-name##.
+  - full-strings-used: Define it in case of two LED strings used.
+
+PWM specific optional properties:
+  - pwm-period: PWM period value. Define it in case of PWM based control mode.
+                If this property is not defined, then brightness control mode is I2C.
+  - pwm-max-brightness: Max current value in register 0x04 and 0x05.
+                        Range is from 0 to 2047.
+  - pwms and pwm-names: Please refer to Documentation/devicetree/bindings/pwm/pwm.txt.
+
+Example 1:
+Brightness mode is I2C. Two backlight strings are used.
+If 'bl-name' is not specified, then the lcd channel name is 'lcd-backlight'
+by default. (/sys/class/backlight/lcd-backlight/)
+
+lm3632@11 {
+	compatible = "ti,lm3632";
+	reg = <0x11>;
+
+	ti,en-gpio = <&gpio0 3 0>;
+
+	backlight {
+		compatible = "ti,lm3632-backlight";
+		full-strings-used;
+	};
+};
+
+Example 2:
+Backlight mode is PWM. Brightness is controlled by PWM controller, PWM3943.
+PWM#0 is port number of PMW3943.
+Channel name is 'lcd'. (/sys/class/backlight/lcd/)
+
+lm3632@11 {
+	compatible = "ti,lm3632";
+	reg = <0x11>;
+
+	ti,en-gpio = <&gpio0 3 0>;
+
+	backlight {
+		compatible = "ti,lm3632-backlight";
+
+		bl-name = "lcd";
+		full-strings-used;
+
+		pwm-period = <10000>;
+		pwm-max-brightness = <1637>; /* 20mA */
+
+		/* PWM controller for lm3632 backlight */
+		pwms = <&pwm3943 0 10000>;
+		pwm-names = "lm3632-backlight";
+	};
+};

@@ -1,0 +1,59 @@
+TI LM3631 MFD Driver
+
+Required properties:
+  - compatible: "ti,lm3631"
+  - reg: I2C slave address. 0x29.
+  - ti,en-gpio: GPIO number of LM3631 nRST pin.
+
+LM3631 consists of two sub-devices, lm3631-regulator and lm3631-bl.
+
+For the LM3631 regulator properties please refer to:
+Documentation/devicetree/bindings/regulator/lm3631-regulator.txt
+
+For the LM3631 backlight properties please refer to:
+Documentation/devicetree/bindings/video/backlight/lm3631_bl.txt
+
+Example:
+
+lm3631@29 {
+	compatible = "ti,lm3631";
+	reg = <0x29>;
+
+	/* GPIO134 for HWEN pin */
+	ti,en-gpio = <&gpio5 6 0>;
+
+	/* Only Vpos and Vneg are used with LCD boost */
+	regulators {
+		compatible = "ti,lm3631-regulator";
+
+		vboost {
+			regulator-name = "lcd_boost";
+			regulator-min-microvolt = <4500000>;
+			regulator-max-microvolt = <6350000>;
+			regulator-always-on;
+		};
+
+		vpos {
+			regulator-name = "lcd_vpos";
+			regulator-min-microvolt = <4000000>;
+			regulator-max-microvolt = <6000000>;
+			regulator-boot-on;
+		};
+
+		vneg {
+			regulator-name = "lcd_vneg";
+			regulator-min-microvolt = <4000000>;
+			regulator-max-microvolt = <6000000>;
+			regulator-boot-on;
+		};
+	};
+
+	/* Backlight mode is I2C + PWM, two strings used */
+	backlight {
+		compatible = "ti,lm3631-backlight";
+
+		bl-name = "lcd";
+		full-strings-used;
+		mode-comb1;
+	};
+};

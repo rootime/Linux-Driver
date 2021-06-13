@@ -1,0 +1,51 @@
+TI LM3632 Regulator Driver
+
+Required properties:
+  - compatible: "ti,lm3632-regulator"
+  - Regulator init data from of-regulator structure.
+    Please refer to regulator.txt in this directory.
+
+Optional properties:
+  Two GPIO pins are used for enabling/disabling VPOS and VNEG.
+  These properties can be ignored if two LDOs are controlled through the I2C register.
+  - ti,lcm-en1-gpio: GPIO number of LCM_EN1 pin.
+  - ti,lcm-en2-gpio: GPIO number of LCM_EN2 pin.
+
+Example:
+
+lm3632@11 {
+	compatible = "ti,lm3632";
+	reg = <0x11>;
+
+	ti,en-gpio = <&gpio0 3 0>;
+
+	/* Vpos and Vneg are used with LCD boost */
+	regulators {
+		compatible = "ti,lm3632-regulator";
+
+		/* GPIOs for LCM_EN1 and LCM_EN2 pins */
+		ti,lcm-en1-gpio = <&gpio0 2 0>;
+		ti,lcm-en2-gpio = <&gpio0 4 0>;
+
+		vboost {
+			regulator-name = "lcd_boost";
+			regulator-min-microvolt = <4500000>;
+			regulator-max-microvolt = <6400000>;
+			regulator-always-on;
+		};
+
+		vpos {
+			regulator-name = "lcd_vpos";
+			regulator-min-microvolt = <4000000>;
+			regulator-max-microvolt = <6000000>;
+			regulator-boot-on;
+		};
+
+		vneg {
+			regulator-name = "lcd_vneg";
+			regulator-min-microvolt = <4000000>;
+			regulator-max-microvolt = <6000000>;
+			regulator-boot-on;
+		};
+	};
+};
